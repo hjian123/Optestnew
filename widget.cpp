@@ -52,6 +52,25 @@ Widget::Widget(QWidget *parent) :
     connect(stopbt,SIGNAL(clicked()),this,SLOT(onClickedStopbt()));
     connect(setbt,SIGNAL(clicked()),this,SLOT(onClickedSetbt()));
 
+    comStateRight = new QState();             //添加状态right
+    comStateRight->setObjectName("right");
+    comStateRight->assignProperty(startbt,"enabled",true);
+    comStateRight->assignProperty(stopbt,"enabled",true);
+    comStateRight->assignProperty(setbt,"enabled",true);
+
+    comStateWrong = new QState();       //添加状态wrong
+    comStateWrong->setObjectName("wrong");
+    comStateWrong->assignProperty(startbt,"enabled",false);
+    comStateWrong->assignProperty(stopbt,"enabled",false);
+    comStateWrong->assignProperty(setbt,"enabled",false);
+    comStateRight->addTransition(this,SIGNAL(chgStater2w()),comStateWrong);
+    comStateWrong->addTransition(this,SIGNAL(chgStatew2r()),comStateRight);
+
+    machine = new QStateMachine();
+    machine->addState(comStateRight);
+    machine->addState(comStateWrong);
+    machine->setInitialState(comStateRight);
+
     canProtcl = new CanProtcl(this);
     connect(canProtcl,SIGNAL(msgChanged()),this,SLOT(checkMsg()));
 
@@ -109,7 +128,7 @@ void Widget::checkMsg(void)
     switch(cmd){
         case HEART_BEAT:{
                 qDebug()<<"checkMsg HEART_BEAT";
-                comState = true;
+                emit chgStatew2r();
                  break;
         }
         case START_TEST:{
@@ -138,7 +157,7 @@ void Widget::checkMsg(void)
 
 void Widget::comtimerUpdate()
 {
-     comState = false;
+     emit chgStater2w();
      canProtcl->vHeartBeat();
 }
 

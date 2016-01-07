@@ -7,7 +7,8 @@
 #include <QPushButton>
 #include <QTextEdit>
 #include <QRadioButton>
-
+#include <QState>
+#include <QStateMachine>
 namespace Ui {
 class Widget;
 }
@@ -23,14 +24,19 @@ public:
 private:
     Ui::Widget *ui;
     CanProtcl  *canProtcl;
-    bool comState;                  //表明CAN接口的通讯状态，正常或异常
+    QState *comStateRight;                  //表明CAN接口的通讯状态，正常或异常
+    QState *comStateWrong;                  //表明CAN接口的通讯状态，正常或异常
+    QStateMachine *machine;
     QTimer *comtimer;
     QPushButton  *startbt;
     QPushButton  *stopbt;
     QPushButton  *setbt;
     QTextEdit  *outPutMsg;
     QRadioButton *autorb;
-    QRadioButton *manualrb;
+    QRadioButton *manualrb;  
+signals:
+    void chgStater2w();
+    void chgStatew2r();
 protected slots:
     void onCkeckedAutorb(bool check);
     void onCkeckedManualrb(bool check);
