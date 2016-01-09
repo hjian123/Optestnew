@@ -1,5 +1,7 @@
 <RCC>
     <qresource prefix="/">
         <file>img/cubemap_negx.jpg</file>
+        <file>img/plus-sign.png</file>
+        <file>img/minus-sign.png</file>
     </qresource>
 </RCC>

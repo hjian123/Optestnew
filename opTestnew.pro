@@ -15,11 +15,13 @@ TEMPLATE = app
 SOURCES += main.cpp\
         widget.cpp \
     canprotcl.cpp \
-    cantest.cpp
+    cantest.cpp \
+    setpanel.cpp
 
 HEADERS  += widget.h \
     canprotcl.h \
-    cantest.h
+    cantest.h \
+    setpanel.h
 
 FORMS    += widget.ui
 

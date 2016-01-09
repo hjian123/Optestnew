@@ -27,8 +27,9 @@ struct can_frame {
 #define HEART_BEAT 0x30//
 #define START_TEST 0x31	//
 #define STOP_TEST  0x32	//
-#define SET_DETAILS   0x33	//
+#define SET_MAXVALUE   0x33	//
 #define SET_AUTO_MAN 0x34	//
+#define SET_MINVALUE   0x35	//
 
 #define CFG_ID          0x33	// 配置设备ID
 #define GET_DEVINFO_1   0x34	// 设备信息查询
@@ -77,11 +78,12 @@ public:
 
     tCanData SendData;
     tCanData RevData;
-    void vStartTest(void);
+    void vStartTest();
     void vStopTest(void);
-    void vSet(void);
+    void vSetMax(int a);
+    void vSetMin(int a);
     void vSetAutoMan(bool a);
-    void vHeartBeat(void);
+    void vHeartBeat();
  private:
     typedef enum
     {
@@ -112,6 +114,10 @@ public:
 
     CanTest  *canTest;
     bool  autoManual;
+    bool  finished;
+    int     maxValue;
+    int     minValue;
+    tCanData bkpSendData; //SendData
 signals:
     void msgChanged(); //接收到完整的一帧数据后发送该信号
 protected slots:
