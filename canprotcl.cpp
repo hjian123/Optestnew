@@ -14,6 +14,7 @@ CanProtcl::~CanProtcl()
 
 void CanProtcl::vStartTest()
 {
+//     finished = a;
     vSendPacket(FIRST_RPLY_ID,START_TEST);
 }
 
@@ -22,12 +23,19 @@ void CanProtcl::vStopTest()
     vSendPacket(FIRST_RPLY_ID,STOP_TEST);
 }
 
-void CanProtcl::vSet()
+void CanProtcl::vSetMax(int a)
 {
-    vSendPacket(FIRST_RPLY_ID,SET_DETAILS);
+    maxValue = a;
+    vSendPacket(FIRST_RPLY_ID,SET_MAXVALUE);
 }
 
-void CanProtcl::vSetAutoMan(bool a)
+void CanProtcl::vSetMin(int a)
+{
+    minValue = a;
+    vSendPacket(FIRST_RPLY_ID,SET_MINVALUE);
+}
+
+void CanProtcl::vSetAutoMan(bool a) //0:auto 1:man
 {
     autoManual = a;
     vSendPacket(FIRST_RPLY_ID,SET_AUTO_MAN);
@@ -63,11 +71,22 @@ void CanProtcl::vSendPacket(unsigned int ID,unsigned char cmd)
             break;
         }
         case STOP_TEST:{
-            SendData.ucLen = 5;
+            SendData.ucLen = 6;
+     //       SendData.ucBuf[4] = finished;
             break;
      }
-        case SET_DETAILS:{
-            SendData.ucLen = 5;
+        case SET_MAXVALUE:{
+            SendData.ucLen = 8;
+            SendData.ucBuf[4] = maxValue &0xff;
+            SendData.ucBuf[5] = maxValue>>8 &0xff;
+            SendData.ucBuf[6] = maxValue>>16 &0xff;
+            break;
+        }
+        case SET_MINVALUE:{
+            SendData.ucLen = 8;
+            SendData.ucBuf[4] = minValue &0xff;
+            SendData.ucBuf[5] = minValue>>8 &0xff;
+            SendData.ucBuf[6] = minValue>>16 &0xff;
             break;
         }
         case SET_AUTO_MAN:{
@@ -104,11 +123,11 @@ bool CanProtcl::bCheckErrorRply(CanProtcl::tRevFrame *frame)
             lencount = 0;
             return false;
         }
-        else if((SendData.ucBuf[2] | 0x80)!= frame->ucFrameBuf[2]){
+    /*    else if((SendData.ucBuf[2] | 0x80)!= frame->ucFrameBuf[2]){
             printf("first Cmd error !\n");
             lencount = 0;
             return false;
-        }
+        }*/
 
         lencount += frame->uiFrameLen; //此次CAN数据长度
         RevData.ucLen = lencount;
@@ -127,10 +146,10 @@ bool CanProtcl::bCheckErrorRply(CanProtcl::tRevFrame *frame)
                 printf("Frame Address error: not a host address !\n");
                 return false;
             }
-            else if((SendData.ucBuf[2] | 0x80)!= frame->ucFrameBuf[2]){
+      /*      else if((SendData.ucBuf[2] | 0x80)!= frame->ucFrameBuf[2]){
                 printf("last Cmd error !\n");
                 return false;
-            }
+            }*/
             else if(frame->uiFrameLen  != frame->ucFrameBuf[3]) {     //检查长度
                  printf("Frame length error !\n");
                  return false;
@@ -175,13 +194,13 @@ bool CanProtcl::bCheckErrorRply(CanProtcl::tRevFrame *frame)
     else return true;
 }
 
-void CanProtcl::onRevChanged()
+ void CanProtcl::onRevChanged()
 {
-    tRevFrame revFrame;
-    memcpy(revFrame.ucFrameBuf,canTest->recv_frame.data,canTest->recv_frame.can_dlc);
-    revFrame.uiFrameLen = canTest->recv_frame.can_dlc;
-    revFrame.uiCanID = canTest->recv_frame.can_id;
+        tRevFrame revFrame;
+        memcpy(revFrame.ucFrameBuf,canTest->recv_frame.data,canTest->recv_frame.can_dlc);
+        revFrame.uiFrameLen = canTest->recv_frame.can_dlc;
+        revFrame.uiCanID = canTest->recv_frame.can_id;
 
-    bCheckErrorRply(&revFrame);
+        bCheckErrorRply(&revFrame);
 }
 

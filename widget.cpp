@@ -13,6 +13,7 @@ Widget::Widget(QWidget *parent) :
     ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    setCursor(Qt::BlankCursor);
     resize(1024,600);
     setAutoFillBackground(true);
     QPalette palette;
@@ -23,8 +24,12 @@ Widget::Widget(QWidget *parent) :
     QVBoxLayout  *mainLayoutV = new QVBoxLayout(this);
     QHBoxLayout  *mainLayoutH = new QHBoxLayout();
     outPutMsg = new QTextEdit();
-    outPutMsg->insertPlainText(getCurrentTime());
-    outPutMsg->insertPlainText("    欢迎使用，请稍后...\n");
+    outPutMsg->setFocusPolicy(Qt::NoFocus);
+    outPutMsg->setCursor(Qt::BlankCursor);
+    outPutMsg->setTextInteractionFlags(Qt::NoTextInteraction);
+  //  outPutMsg->setEnabled(false);  //设置位只读
+    outPutMsg->append(getCurrentTime());
+    outPutMsg->append("    欢迎使用，请稍后...\n");
     mainLayoutH->addWidget(outPutMsg,4);
 
     QGroupBox  *gb = new QGroupBox();
@@ -99,6 +104,7 @@ Widget::Widget(QWidget *parent) :
 //    canProtcl->enableRev = true;
 
     outtimer = new QTimer(this);
+    connect(outtimer,SIGNAL(timeout()),this,SLOT(outtimerUpdate()));
     comtimer = new QTimer(this);
     connect(comtimer,SIGNAL(timeout()),this,SLOT(comtimerUpdate()));
     comtimer->start(1000);
@@ -168,8 +174,8 @@ void Widget::checkMsg(void)
            //     qDebug()<<comtimer->remainingTime();
                 outtimer->stop(); 
                 if(firstRply) {
-                    outPutMsg->insertPlainText(getCurrentTime());
-                    outPutMsg->insertPlainText("    初始化成功，请开始测试\n");
+                    outPutMsg->append(getCurrentTime());
+                    outPutMsg->append("    初始化成功，请开始测试\n");
                     firstRply = false;
                 }
                 emit chgStatew2r();
@@ -182,12 +188,12 @@ void Widget::checkMsg(void)
                            canProtcl->vStartTest();
                        }
                        if (TEST_SUCCESS == ((buf[4]>>4) &0x03)){
-                           outPutMsg->insertPlainText(getCurrentTime());
-                           outPutMsg->insertPlainText("    本次测试成功\n");
+                           outPutMsg->append(getCurrentTime());
+                           outPutMsg->append("    本次测试成功\n");
                        }
                        else if(TEST_FAIL == ((buf[4]>>4) &0x03)){
-                           outPutMsg->insertPlainText(getCurrentTime());
-                           outPutMsg->insertPlainText("    本次测试失败\n");
+                           outPutMsg->append(getCurrentTime());
+                           outPutMsg->append("    本次测试失败\n");
                        }
                     startTestFg = false;
                 }
@@ -196,10 +202,10 @@ void Widget::checkMsg(void)
         case START_TEST:{
           //       qDebug()<<"checkMsg START_TEST";
                  setbt->setEnabled(false);
-                 outPutMsg->insertPlainText(getCurrentTime());
+                 outPutMsg->append(getCurrentTime());
                  if(0== testMode)
-                         outPutMsg->insertPlainText("    开始自动测试\n");
-                 else outPutMsg->insertPlainText("    开始手动测试\n");
+                         outPutMsg->append("    开始自动测试\n");
+                 else outPutMsg->append("    开始手动测试\n");
                  comtimer->start(1000);
                  startTestFg = true;
                  setbt->setEnabled(false);
@@ -208,23 +214,23 @@ void Widget::checkMsg(void)
         case STOP_TEST:{
           //       qDebug()<<"checkMsg STOP_TEST";
                  setbt->setEnabled(true);
-                 outPutMsg->insertPlainText(getCurrentTime());
-                 outPutMsg->insertPlainText("    停止测试\n");
+                 outPutMsg->append(getCurrentTime());
+                 outPutMsg->append("    停止测试\n");
                  comtimer->start(1000);
                  break;
         }
         case SET_MAXVALUE:{
                  qDebug()<<"checkMsg SET_MAXVALUE";
-             //    outPutMsg->insertPlainText(getCurrentTime());
-             //    outPutMsg->insertPlainText("    设置成功\n");
+             //    outPutMsg->append(getCurrentTime());
+             //    outPutMsg->append("    设置成功\n");
              //    comtimer->start(1000);
                     canProtcl->vSetMin(setpanel->dwValue);
                  break;
         }
         case SET_MINVALUE:{
          //    qDebug()<<"checkMsg SET_MAXVALUE";
-                   outPutMsg->insertPlainText(getCurrentTime());
-                   outPutMsg->insertPlainText("    设置成功\n");
+                   outPutMsg->append(getCurrentTime());
+                   outPutMsg->append("    设置成功\n");
                    comtimer->start(1000);
              break;
          }
@@ -247,6 +253,6 @@ void Widget::comtimerUpdate()
 void Widget::outtimerUpdate()
 {
     emit chgStater2w();
-    outPutMsg->insertPlainText(getCurrentTime());
-    outPutMsg->insertPlainText("    通信超时，请确认原因\n");
+    outPutMsg->append(getCurrentTime());
+    outPutMsg->append("    通信超时，请确认原因\n");
 }

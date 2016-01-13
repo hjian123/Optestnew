@@ -21,7 +21,10 @@ Setpanel::Setpanel(QWidget *parent) : QWidget(parent)
     upedit->setValidator(validator);
     upedit->setStyleSheet("QLineEdit{background-color:transparent;font-size:24px;color:white}");
     upedit->setAlignment(Qt::AlignCenter);
+    upedit->setCursor(Qt::BlankCursor);
+    upedit->setFocusPolicy(Qt::NoFocus);
     upedit->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    upedit->setEnabled(false);
     upaddbt = new QPushButton();
     upaddbt->setIcon(QIcon(":/img/plus-sign.png"));
     upaddbt->setStyleSheet("QPushButton{background-color:transparent;}");
@@ -42,9 +45,12 @@ Setpanel::Setpanel(QWidget *parent) : QWidget(parent)
     dwsubbt->setSizePolicy(QSizePolicy::Ignored,QSizePolicy::Fixed);
     dwedit = new QLineEdit(QString::number(dwValue,10));
     dwedit->setAlignment(Qt::AlignCenter);
+    dwedit->setFocusPolicy(Qt::NoFocus);
     dwedit->setValidator(validator);
+    dwedit->setCursor(Qt::BlankCursor);
     dwedit->setStyleSheet("QLineEdit{background-color:transparent;font-size:24px;color:white}");
     dwedit->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+    dwedit->setEnabled(false);  //只读
     dwaddbt = new QPushButton();
     dwaddbt->setIcon(QIcon(":/img/plus-sign.png"));
     dwaddbt->setStyleSheet("QPushButton{background-color:transparent;}");
